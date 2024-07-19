@@ -29,6 +29,12 @@ class Api::V1::TasksController < ApplicationController
     head :no_content
   end
 
+  def update_due_date
+    ::Tasks::UpdateDueDateJob.perform_later(update_due_date_params)
+
+    head :no_content
+  end
+
   private
 
   def set_task
@@ -37,5 +43,9 @@ class Api::V1::TasksController < ApplicationController
 
   def save_params
     params.require(:task).permit(:title, :description, :due_date)
+  end
+
+  def update_due_date_params
+    params.require(:task).permit(:due_date)
   end
 end

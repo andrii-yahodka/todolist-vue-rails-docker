@@ -17,6 +17,15 @@
       <button type="submit">{{ isEditing ? 'Update Task' : 'Create Task' }}</button>
       <button type="button" v-if="isEditing" @click="cancelEdit()">Cancel</button>
     </form>
+
+    <form @submit.prevent="updateDueDate">
+      <div>
+        <label for="new_due_date">New Due Date:</label>
+        <input type="date" v-model="newDueDate" id="new_due_date" required />
+      </div>
+      <button type="submit">Update Due Date for All Tasks</button>
+    </form>
+
     <table>
       <thead>
         <tr>
@@ -56,7 +65,8 @@ export default {
         description: '',
         due_date: ''
       },
-      isEditing: false
+      newDueDate: '',
+      isEditing: false,
     };
   },
   mounted() {
@@ -121,6 +131,21 @@ export default {
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       return new Date(date).toLocaleDateString(undefined, options);
     },
+    async updateDueDate() {
+      try {
+        const response = await apiClient.post(`/tasks/update_due_date`, {
+          due_date: this.newDueDate,
+        });
+        console.log('Response:', response.data);
+        // Update the local tasks list with the new due date
+        this.tasks.forEach(task => {
+          task.due_date = this.newDueDate;
+        });
+        this.newDueDate = '';
+      } catch (error) {
+        console.error('Error updating due date:', error);
+      }
+    },
   },
 };
 </script>
@@ -150,7 +175,8 @@ label {
   margin-bottom: 5px;
 }
 input[type="text"],
-input[type="date"] {
+input[type="date"],
+select {
   width: 100%;
   padding: 8px;
   box-sizing: border-box;
