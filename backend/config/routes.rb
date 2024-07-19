@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :tasks, only: [:index, :create, :update, :destroy]
+
+      namespace :tasks do
+        post :update_due_date
+      end
     end
   end
 
